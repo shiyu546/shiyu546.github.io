@@ -1,0 +1,558 @@
+
+ <!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  
+    <title>mybatis浅析 | Hexo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
+    
+    <meta name="author" content="John Doe">
+    
+
+    
+    <meta name="description" content="1.mybatis调用结构 1.1 mybatis基础核心类 1.2 SqlSessionFactoryBuilder 1.3 SqlSessionFactory 1.4 SqlSession   2.SqlSession 2.1 SqlSession调用 2.2 Executor与mybatis的缓存     1.mybatis调用结构1.1 mybatis基础核心类&amp;emsp;&amp;emsp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mybatis浅析">
+<meta property="og:url" content="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="1.mybatis调用结构 1.1 mybatis基础核心类 1.2 SqlSessionFactoryBuilder 1.3 SqlSessionFactory 1.4 SqlSession   2.SqlSession 2.1 SqlSession调用 2.2 Executor与mybatis的缓存     1.mybatis调用结构1.1 mybatis基础核心类&amp;emsp;&amp;emsp">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-06-01T09:01:54.000Z">
+<meta property="article:modified_time" content="2020-08-02T10:56:22.362Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="mybatis">
+<meta name="twitter:card" content="summary">
+
+    
+    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    
+    
+    <link rel="icon" href="/img/favicon.ico">
+    
+    
+    <link rel="apple-touch-icon" href="/img/jacman.jpg">
+    <link rel="apple-touch-icon-precomposed" href="/img/jacman.jpg">
+    
+    
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/%02.css">
+<link rel="stylesheet" href="/.css">
+
+<meta name="generator" content="Hexo 5.1.1"></head>
+
+  <body>
+    <header>
+      
+<div>
+		
+			<div id="imglogo">
+				<a href="/"><img src="/img/logo.png" alt="Hexo" title="Hexo"/></a>
+			</div>
+			
+			<div id="textlogo">
+				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h2 class="blog-motto"></h2>
+			</div>
+			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
+			</a></div>
+			<nav class="animated">
+				<ul>
+					<ul>
+					 
+						<li><a href="/">Home</a></li>
+					
+						<li><a href="/archives">Archives</a></li>
+					
+						<li><a href="/tags">tags</a></li>
+					
+						<li><a href="/categories">categories</a></li>
+					
+					<li>
+ 					
+					<form class="search" action="//google.com/search" method="get" accept-charset="utf-8">
+						<label>Search</label>
+						<input type="search" id="search" name="q" autocomplete="off" maxlength="20" placeholder="Search" />
+						<input type="hidden" name="q" value="site:example.com">
+					</form>
+					
+					</li>
+				</ul>
+			</nav>			
+</div>
+    </header>
+    <div id="container">
+      <div id="main" class="post" itemscope itemprop="blogPost">
+  
+	<article itemprop="articleBody"> 
+		<header class="article-info clearfix">
+  <h1 itemprop="name">
+    
+      <a href="/2020/06/01/mybatis浅析/" title="mybatis浅析" itemprop="url">mybatis浅析</a>
+  </h1>
+  <p class="article-author">By
+       
+		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		
+  <p class="article-time">
+    <time datetime="2020-06-01T09:01:54.000Z" itemprop="datePublished"> Published 2020-06-01</time>
+    
+  </p>
+</header>
+	<div class="article-content">
+		
+		<div id="toc" class="toc-article">
+			<strong class="toc-title">Contents</strong>
+		
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-mybatis%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">1.mybatis调用结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-mybatis%E5%9F%BA%E7%A1%80%E6%A0%B8%E5%BF%83%E7%B1%BB"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 mybatis基础核心类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-SqlSessionFactoryBuilder"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 SqlSessionFactoryBuilder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-SqlSessionFactory"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 SqlSessionFactory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-SqlSession"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 SqlSession</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-SqlSession"><span class="toc-number">2.</span> <span class="toc-text">2.SqlSession</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-SqlSession%E8%B0%83%E7%94%A8"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 SqlSession调用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Executor%E4%B8%8Emybatis%E7%9A%84%E7%BC%93%E5%AD%98"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 Executor与mybatis的缓存</span></a></li></ol></li></ol>
+		
+		</div>
+		
+		<!-- TOC -->
+
+<ul>
+<li><a href="#1mybatis%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84">1.mybatis调用结构</a><ul>
+<li><a href="#11-mybatis%E5%9F%BA%E7%A1%80%E6%A0%B8%E5%BF%83%E7%B1%BB">1.1 mybatis基础核心类</a></li>
+<li><a href="#12-sqlsessionfactorybuilder">1.2 SqlSessionFactoryBuilder</a></li>
+<li><a href="#13-sqlsessionfactory">1.3 SqlSessionFactory</a></li>
+<li><a href="#14-sqlsession">1.4 SqlSession</a></li>
+</ul>
+</li>
+<li><a href="#2sqlsession">2.SqlSession</a><ul>
+<li><a href="#21-sqlsession%E8%B0%83%E7%94%A8">2.1 SqlSession调用</a></li>
+<li><a href="#22-executor%E4%B8%8Emybatis%E7%9A%84%E7%BC%93%E5%AD%98">2.2 Executor与mybatis的缓存</a></li>
+</ul>
+</li>
+</ul>
+<!-- /TOC -->
+<h2 id="1-mybatis调用结构"><a href="#1-mybatis调用结构" class="headerlink" title="1.mybatis调用结构"></a>1.mybatis调用结构</h2><h3 id="1-1-mybatis基础核心类"><a href="#1-1-mybatis基础核心类" class="headerlink" title="1.1 mybatis基础核心类"></a>1.1 mybatis基础核心类</h3><p>&emsp;&emsp;mybatis是一个ORM框架，由于具有非常灵活的SQL编写方法，所以使用比较广泛，下面分析一下mybatis对JDBC做了哪些封装和增强.  </p>
+<p>&emsp;&emsp;Mybatis的核心是SqlSessionFacotry类，SqlSessionFactory从SqlSessionFactoryBuilder获得。我们可以从SqlSessionFactory中获取SqlSession实例，SqlSession提供了数据库执行SQL命令的所有方法。整个过程如下：  </p>
+
+
+<h3 id="1-2-SqlSessionFactoryBuilder"><a href="#1-2-SqlSessionFactoryBuilder" class="headerlink" title="1.2 SqlSessionFactoryBuilder"></a>1.2 SqlSessionFactoryBuilder</h3><p>&emsp;&emsp;SqlSessionFactoryBuilder有多种重载方法生成SqlSessionFactory。  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, String environment)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, Properties properties)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, String env, Properties props)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(Configuration config)</span>  </span></span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;第一种方法是最常用的，它接受一个指向 XML 文件（也就是之前讨论的 mybatis-config.xml 文件）的 InputStream 实例。可选的参数是 environment 和 properties。environment 决定加载哪种环境，包括数据源和事务管理器。  </p>
+<p>&emsp;&emsp;build()方法最重要的功能是生成一个Configuration对象，Configuration对象表示mybatis的全局配置信息以及mapper文件，SqlSessionFactory关心的所有信息都包含其中。  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, String environment, Properties properties)</span> </span>&#123;  </span><br><span class="line">  <span class="keyword">try</span> &#123;  </span><br><span class="line">    XMLConfigBuilder parser = <span class="keyword">new</span> XMLConfigBuilder(inputStream, environment, properties);  </span><br><span class="line">    <span class="keyword">return</span> build(parser.parse());  </span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">    <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">&quot;Error building SqlSession.&quot;</span>, e);  </span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;  </span><br><span class="line">    ErrorContext.instance().reset();  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">      inputStream.close();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;  </span><br><span class="line">      <span class="comment">// Intentionally ignore. Prefer previous error.  </span></span><br><span class="line">    &#125;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> SqlSessionFactory <span class="title">build</span><span class="params">(Configuration config)</span> </span>&#123;  </span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> DefaultSqlSessionFactory(config);  </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-SqlSessionFactory"><a href="#1-3-SqlSessionFactory" class="headerlink" title="1.3 SqlSessionFactory"></a>1.3 SqlSessionFactory</h3><p>&emsp;&emsp;SqlSessionFactory生成SqlSession有八种重载方法：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(<span class="keyword">boolean</span> autoCommit)</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(Connection connection)</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(TransactionIsolationLevel level)</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(ExecutorType execType, TransactionIsolationLevel level)</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(ExecutorType execType)</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(ExecutorType execType, <span class="keyword">boolean</span> autoCommit)</span>  </span></span><br><span class="line"><span class="function">SqlSession <span class="title">openSession</span><span class="params">(ExecutorType execType, Connection connection)</span>  </span></span><br><span class="line"><span class="function">Configuration <span class="title">getConfiguration</span><span class="params">()</span></span>;  </span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;这些方法的参数可以归结为以下几点：  </p>
+<ul>
+<li><strong>事务处理</strong>：你希望在 session 作用域中使用事务作用域，还是使用自动提交（auto-commit）？（对很多数据库和/或 JDBC 驱动来说，等同于关闭事务支持）,以及设置隔离级别。  </li>
+<li><strong>数据库连接</strong>：你希望 MyBatis 帮你从已配置的数据源获取连接，还是使用自己提供的连接？  </li>
+<li><strong>语句执行</strong>：你希望 MyBatis 复用 PreparedStatement 和/或批量更新语句（包括插入语句和删除语句）吗？  </li>
+</ul>
+<p>&emsp;&emsp;ExecutorType是一个枚举类型,有以下三种情况：  </p>
+<ul>
+<li><strong>ExecutorType.SIMPLE</strong>：该类型的执行器没有特别的行为。它为每个语句的执行创建一个新的预处理语句。  </li>
+<li><strong>ExecutorType.REUSE</strong>：该类型的执行器会复用预处理语句。  </li>
+<li><strong>ExecutorType.BATCH</strong>：该类型的执行器会批量执行所有更新语句，如果 SELECT 在多个更新中间执行，将在必要时将多条更新语句分隔开来，以方便理解。  </li>
+</ul>
+<h3 id="1-4-SqlSession"><a href="#1-4-SqlSession" class="headerlink" title="1.4 SqlSession"></a>1.4 SqlSession</h3><p>&emsp;&emsp;SqlSession的方法大致可以分为两类：一类做数据操作，包括CRUD;另一类做数据控制，例如事务控制。以下展示部分接口方法：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//数据操作部分，CRUD操作  </span></span><br><span class="line">&lt;T&gt; <span class="function">T <span class="title">selectOne</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;E&gt; List&lt;E&gt; <span class="title">selectList</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;T&gt; Cursor&lt;T&gt; <span class="title">selectCursor</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;K,V&gt; Map&lt;K,V&gt; <span class="title">selectMap</span><span class="params">(String statement, Object parameter, String mapKey)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">insert</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">update</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">delete</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;E&gt; List&lt;E&gt; <span class="title">selectList</span> <span class="params">(String statement, Object parameter, RowBounds rowBounds)</span>  </span></span><br><span class="line"><span class="function">&lt;T&gt; Cursor&lt;T&gt; <span class="title">selectCursor</span><span class="params">(String statement, Object parameter, RowBounds rowBounds)</span>  </span></span><br><span class="line"><span class="function">&lt;K,V&gt; Map&lt;K,V&gt; <span class="title">selectMap</span><span class="params">(String statement, Object parameter, String mapKey, RowBounds rowbounds)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">select</span> <span class="params">(String statement, Object parameter, ResultHandler&lt;T&gt; handler)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">select</span> <span class="params">(String statement, Object parameter, RowBounds rowBounds, ResultHandler&lt;T&gt; handler)</span>  </span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="comment">//事务控制  </span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">commit</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">commit</span><span class="params">(<span class="keyword">boolean</span> force)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rollback</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rollback</span><span class="params">(<span class="keyword">boolean</span> force)</span>  </span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-SqlSession"><a href="#2-SqlSession" class="headerlink" title="2.SqlSession"></a>2.SqlSession</h2><h3 id="2-1-SqlSession调用"><a href="#2-1-SqlSession调用" class="headerlink" title="2.1 SqlSession调用"></a>2.1 SqlSession调用</h3><p>&emsp;&emsp;以SqlSession的selectList()方法为例,该方法实际上就是将具体的SQL执行委托给具体的Executor类去执行，上面说过共有三种ExecutorType：Simple，reuse,batch。除此之外，mybatis中还有一种CachingExecutor的实现,类的继承图如下：</p>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Executor executor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">selectList</span><span class="params">(String statement, Object parameter, RowBounds rowBounds)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    MappedStatement ms = configuration.getMappedStatement(statement);</span><br><span class="line">    <span class="keyword">return</span> executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">&quot;Error querying database.  Cause: &quot;</span> + e, e);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    ErrorContext.instance().reset();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-Executor与mybatis的缓存"><a href="#2-2-Executor与mybatis的缓存" class="headerlink" title="2.2 Executor与mybatis的缓存"></a>2.2 Executor与mybatis的缓存</h3><p>&emsp;&emsp;BaseExecutor与CachingExecutor是具体执行SQL的地方，先看BaseExecutor：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  BoundSql boundSql = ms.getBoundSql(parameter);</span><br><span class="line">  CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);</span><br><span class="line">  <span class="keyword">return</span> query(ms, parameter, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> PerpetualCache localCache;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  ... <span class="comment">//省略一些代码</span></span><br><span class="line">  List&lt;E&gt; list;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    queryStack++;</span><br><span class="line">    list = resultHandler == <span class="keyword">null</span> ? (List&lt;E&gt;) localCache.getObject(key) : <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (list != <span class="keyword">null</span>) &#123;</span><br><span class="line">      handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    queryStack--;</span><br><span class="line">  &#125;</span><br><span class="line">  ... <span class="comment">//省略一些代码</span></span><br><span class="line">  <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;从代码中可以知道查询是先走缓存的，localCache是Executor的一个字段，Executor又是SqlSession的一个字段，所以localCache的生命周期是在SqlSession的作用域内，这便是mybatis的本地缓存，也称为一级缓存。</p>
+<p>&emsp;&emsp;CachingExecutor实现了mybatis的二级缓存，先看代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Executor delegate;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> TransactionalCacheManager tcm = <span class="keyword">new</span> TransactionalCacheManager();</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">query</span><span class="params">(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  Cache cache = ms.getCache();</span><br><span class="line">  <span class="keyword">if</span> (cache != <span class="keyword">null</span>) &#123;</span><br><span class="line">    flushCacheIfRequired(ms);</span><br><span class="line">    <span class="keyword">if</span> (ms.isUseCache() &amp;&amp; resultHandler == <span class="keyword">null</span>) &#123;</span><br><span class="line">      ensureNoOutParams(ms, boundSql);</span><br><span class="line">      List&lt;E&gt; list = (List&lt;E&gt;) tcm.getObject(cache, key);</span><br><span class="line">      <span class="keyword">if</span> (list == <span class="keyword">null</span>) &#123;</span><br><span class="line">        list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">        tcm.putObject(cache, key, list); <span class="comment">// issue #578 and #116</span></span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> list;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;CachingExecutor采用的装饰器模式实现的，其本身包含了一个Executor字段。从tcm.getObject(cache, key)中可知该缓存的key由两部分组成，一个是MappedStatement中的Cache，另一个是SQL语句（具体实现涉及到一个CacheKey类，姑且当作SQL语句），MappedStatement是mapper节点的抽象，也就是mapper.xml中的SQL节点，形如：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectAuthorLinkedHashMap&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;java.util.LinkedHashMap&quot;</span>&gt;</span></span><br><span class="line">       select id, username from author where id = #&#123;value&#125;</span><br><span class="line">   <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>&emsp;&emsp;而MappedStatement是全局配置对象Configuration的属性，所以该Cache是全局的，从而二级缓存是全局的，其key是SQL节点和SQL语句。</p>
+
+  
+	</div>
+		<footer class="article-footer clearfix">
+<div class="article-catetags">
+
+<div class="article-categories">
+  <span></span>
+  <a class="article-category-link" href="/categories/JAVA/">JAVA</a>►<a class="article-category-link" href="/categories/JAVA/%E6%A1%86%E6%9E%B6/">框架</a>►<a class="article-category-link" href="/categories/JAVA/%E6%A1%86%E6%9E%B6/mybatis/">mybatis</a>
+</div>
+
+
+  <div class="article-tags">
+  
+  <span></span> <a href="/tags/mybatis/">mybatis</a>
+  </div>
+
+</div>
+
+
+
+	<div class="article-share" id="share">
+	
+	  <div data-url="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/" data-title="mybatis浅析 | Hexo" data-tsina="" class="share clearfix">
+	  </div>
+	
+	</div>
+
+
+</footer>
+
+   	       
+	</article>
+	
+<nav class="article-nav clearfix">
+ 
+ <div class="prev" >
+ <a href="/2020/06/07/SpringMVC-work-flow/" title="SpringMVC work flow">
+  <strong>上一篇：</strong><br/>
+  <span>
+  SpringMVC work flow</span>
+</a>
+</div>
+
+
+</nav>
+
+	
+
+
+
+</div>  
+      <div class="openaside"><a class="navbutton" href="#" title="Show Sidebar"></a></div>
+
+  <div id="toc" class="toc-aside">
+  <strong class="toc-title">Contents</strong>
+ 
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-mybatis%E8%B0%83%E7%94%A8%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">1.mybatis调用结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-mybatis%E5%9F%BA%E7%A1%80%E6%A0%B8%E5%BF%83%E7%B1%BB"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 mybatis基础核心类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-SqlSessionFactoryBuilder"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 SqlSessionFactoryBuilder</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-SqlSessionFactory"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 SqlSessionFactory</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-SqlSession"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 SqlSession</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-SqlSession"><span class="toc-number">2.</span> <span class="toc-text">2.SqlSession</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-SqlSession%E8%B0%83%E7%94%A8"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 SqlSession调用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-Executor%E4%B8%8Emybatis%E7%9A%84%E7%BC%93%E5%AD%98"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 Executor与mybatis的缓存</span></a></li></ol></li></ol>
+ 
+  </div>
+
+<div id="asidepart">
+<div class="closeaside"><a class="closebutton" href="#" title="Hide Sidebar"></a></div>
+<aside class="clearfix">
+
+  
+<div class="categorieslist">
+	<p class="asidetitle">Categories</p>
+		<ul>
+		
+		  
+			<li><a href="/categories/JAVA/" title="JAVA">JAVA<sup>3</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JAVA/Language/" title="Language">Language<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JAVA/框架/SpringMVC/" title="SpringMVC">SpringMVC<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JAVA/框架/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/数据结构/" title="数据结构">数据结构<sup>1</sup></a></li>
+		  
+		
+		  
+			<li><a href="/categories/JAVA/框架/" title="框架">框架<sup>2</sup></a></li>
+		  
+		
+		</ul>
+</div>
+
+
+  
+<div class="tagslist">
+	<p class="asidetitle">Tags</p>
+		<ul class="clearfix">
+		
+			
+				<li><a href="/tags/数据结构/" title="数据结构">数据结构<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mysql/" title="mysql">mysql<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/docker/" title="docker">docker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JAVA/" title="JAVA">JAVA<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/JDK动态代理/" title="JDK动态代理">JDK动态代理<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/spring/" title="spring">spring<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/springmvc/" title="springmvc">springmvc<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/mybatis/" title="mybatis">mybatis<sup>1</sup></a></li>
+			
+		
+		</ul>
+</div>
+
+
+  <div class="linkslist">
+  <p class="asidetitle">Links</p>
+    <ul>
+        
+          <li>
+            
+            	<a href="https://coderq.com" target="_blank" title="一个面向程序员交流分享的新一代社区">码农圈</a>
+            
+          </li>
+        
+    </ul>
+</div>
+
+</aside>
+</div>
+    </div>
+    <footer><div id="footer" >
+	
+	<div class="line">
+		<span></span>
+		<div class="author"></div>
+	</div>
+	
+	
+	<section class="info">
+		<p> 人有滢心，是生亵境 <br/>
+			人有亵心，是生怖境</p>
+	</section>
+	 
+	<div class="social-font" class="clearfix">
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	</div>
+			
+		
+
+		<p class="copyright">
+		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
+		
+		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		
+		
+		</p>
+</div>
+</footer>
+    <script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.imagesloaded.min.js"></script>
+<script src="/js/gallery.js"></script>
+<script src="/js/jquery.qrcode-0.12.0.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.navbar').click(function(){
+    $('header nav').toggleClass('shownav');
+  });
+  var myWidth = 0;
+  function getSize(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+  };
+  var m = $('#main'),
+      a = $('#asidepart'),
+      c = $('.closeaside'),
+      o = $('.openaside');
+  c.click(function(){
+    a.addClass('fadeOut').css('display', 'none');
+    o.css('display', 'block').addClass('fadeIn');
+    m.addClass('moveMain');
+  });
+  o.click(function(){
+    o.css('display', 'none').removeClass('beforeFadeIn');
+    a.css('display', 'block').removeClass('fadeOut').addClass('fadeIn');      
+    m.removeClass('moveMain');
+  });
+  $(window).scroll(function(){
+    o.css("top",Math.max(80,260-$(this).scrollTop()));
+  });
+  
+  $(window).resize(function(){
+    getSize(); 
+    if (myWidth >= 1024) {
+      $('header nav').removeClass('shownav');
+    }else{
+      m.removeClass('moveMain');
+      a.css('display', 'block').removeClass('fadeOut');
+      o.css('display', 'none');
+      
+      $('#toc.toc-aside').css('display', 'none');
+        
+    }
+  });
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  c.click(function(){
+    ta.css('display', 'block').addClass('fadeIn');
+  });
+  o.click(function(){
+    ta.css('display', 'none');
+  });
+  $(window).scroll(function(){
+    ta.css("top",Math.max(140,320-$(this).scrollTop()));
+  });
+});
+</script>
+
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+  var $this = $('.share'),
+      url = $this.attr('data-url'),
+      encodedUrl = encodeURIComponent(url),
+      title = $this.attr('data-title'),
+      tsina = $this.attr('data-tsina'),
+      description = $this.attr('description');
+  var html = [
+  '<div class="hoverqrcode clearfix"></div>',
+  '<a class="overlay" id="qrcode"></a>',
+  '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="article-share-facebook" target="_blank" title="Facebook"></a>',
+  '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="article-share-twitter" target="_blank" title="Twitter"></a>',
+  '<a href="#qrcode" class="article-share-qrcode" title="微信"></a>',
+  '<a href="http://widget.renren.com/dialog/share?resourceUrl=' + encodedUrl + '&srcUrl=' + encodedUrl + '&title=' + title +'" class="article-share-renren" target="_blank" title="人人"></a>',
+  '<a href="http://service.weibo.com/share/share.php?title='+title+'&url='+encodedUrl +'&ralateUid='+ tsina +'&searchPic=true&style=number' +'" class="article-share-weibo" target="_blank" title="微博"></a>',
+  '<span title="Share to"></span>'
+  ].join('');
+  $this.append(html);
+
+  $('.hoverqrcode').hide();
+
+  var myWidth = 0;
+  function updatehoverqrcode(){
+    if( typeof( window.innerWidth ) == 'number' ) {
+      myWidth = window.innerWidth;
+    } else if( document.documentElement && document.documentElement.clientWidth) {
+      myWidth = document.documentElement.clientWidth;
+    };
+    var qrsize = myWidth > 1024 ? 200:100;
+    var options = {render: 'image', size: qrsize, fill: '#2ca6cb', text: url, radius: 0.5, quiet: 1};
+    var p = $('.article-share-qrcode').position();
+    $('.hoverqrcode').empty().css('width', qrsize).css('height', qrsize)
+                          .css('left', p.left-qrsize/2+20).css('top', p.top-qrsize-10)
+                          .qrcode(options);
+  };
+  $(window).resize(function(){
+    $('.hoverqrcode').hide();
+  });
+  $('.article-share-qrcode').click(function(){
+    updatehoverqrcode();
+    $('.hoverqrcode').toggle();
+  });
+  $('.article-share-qrcode').hover(function(){}, function(){
+      $('.hoverqrcode').hide();
+  });
+});   
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){ 
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+}); 
+</script>
+
+
+
+<!-- Analytics Begin -->
+
+
+
+
+
+<!-- Analytics End -->
+
+<!-- Totop Begin -->
+
+	<div id="totop">
+	<a title="Back to Top"><img src="/img/scrollup.png"/></a>
+	</div>
+	<script src="/js/totop.js"></script>
+
+<!-- Totop End -->
+
+<!-- MathJax Begin -->
+<!-- mathjax config similar to math.stackexchange -->
+
+
+<!-- MathJax End -->
+
+<!-- Tiny_search Begin -->
+
+<!-- Tiny_search End -->
+
+  </body>
+</html>
