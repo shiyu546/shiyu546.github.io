@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>B+tree浅析 | Hexo</title>
+    <title>B+tree浅析 | 烟光凝而暮山紫</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
-    <meta name="author" content="John Doe">
+    <meta name="author" content="shiyu">
     
 
     
@@ -15,17 +15,24 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="B+tree浅析">
 <meta property="og:url" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="烟光凝而暮山紫">
 <meta property="og:description" content="1.什么是B+Tree 1.1B+Tree的概念 1.2B+Tree的插入 1.3B+Tree的删除      1.什么是B+Tree1.1B+Tree的概念&amp;emsp;&amp;emsp;B+Tree是一种n-way平衡树，平衡树指的是任一节点子树高度之差不超过1，在DataBase_System_Concepts中，B+树是这样的一种平衡树：该平衡树从根到叶节点每一条路径的长度相同。&amp;emsp;">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree1.png">
+<meta property="og:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree2.png">
+<meta property="og:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree3.png">
+<meta property="og:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree4.png">
+<meta property="og:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree5.png">
+<meta property="og:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree6.png">
 <meta property="article:published_time" content="2020-08-02T09:26:13.000Z">
 <meta property="article:modified_time" content="2020-08-02T12:21:08.468Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:author" content="shiyu">
 <meta property="article:tag" content="数据结构">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree1.png">
 
     
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="烟光凝而暮山紫" type="application/atom+xml">
     
     
     <link rel="icon" href="/img/favicon.ico">
@@ -47,11 +54,11 @@
 <div>
 		
 			<div id="imglogo">
-				<a href="/"><img src="/img/logo.png" alt="Hexo" title="Hexo"/></a>
+				<a href="/"><img src="/img/logo.png" alt="烟光凝而暮山紫" title="烟光凝而暮山紫"/></a>
 			</div>
 			
 			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h1 class="site-name"><a href="/" title="烟光凝而暮山紫">烟光凝而暮山紫</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
 			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
@@ -92,7 +99,7 @@
   </h1>
   <p class="article-author">By
        
-		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		<a href="/about" title="shiyu" target="_blank" itemprop="author">shiyu</a>
 		
   <p class="article-time">
     <time datetime="2020-08-02T09:26:13.000Z" itemprop="datePublished"> Published 2020-08-02</time>
@@ -125,19 +132,19 @@
 
 <p>其中P表示child指针，K表示key。对于n-wayB+tree，非leaf节点含有child指针的个数在[n/2]至n之间，root节点含有的child指针个数在2至n之间。K的个数比child指针的个数少1，即N(k)=N(n)-1。因为key有序，所以每个child指针指向的内容都是有序的，P1指向节点的数据小于K1，即p1–&gt;(-无穷,k1),p2至p(n-1)指向的内容为pi–&gt;[K(i-1),Ki),pn指向的内容为[ki,+无穷)。<br>&emsp;&emsp;B+Tree的record都保存在叶子节点中，每个叶子节点能保存record的数量为[(n-1)/2]至n-1之间。</p>
 <h3 id="1-2B-Tree的插入"><a href="#1-2B-Tree的插入" class="headerlink" title="1.2B+Tree的插入"></a>1.2B+Tree的插入</h3><p>&emsp;&emsp;B+Tree的插入过程类似于查找，先查找待插入值在哪个leaf node中，如果leaf node有空间能容纳待插入entity，则直接插入leaf node；如果leaf node没有空间，那么就需要split leaf node,并调整父节点。以下面的4-way B+Tree为例，</p>
-
+<img src="/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree1.png" class="" title="B+Tree">
 <p>如果插入Adams entity，首先搜寻该B+树，发现该entity应插入标号为1的节点处，但该leaf节点已经有4个pointer，所以要发生split，分裂将生成一个新的节点，并按照[n/2]放在第一个节点，剩余的放在新的节点，分裂生成了两个leaf节点，所以必须有一个parent entity能指向这两个节点，该parent entity的key为第二个节点的第一个key，如下：</p>
-
+<img src="/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree2.png" class="" title="叶子节点分裂示意图">
 <p>然后该parent entity并入原先的parent节点中，如果parent节点中空间不足，则又会导致parent节点分裂，整个过程传播至root节点，如果root节点空间也不够，就发生分裂，树的高度增加1.<br>&emsp;&emsp;插入Adams之后的B+树如下：</p>
-
+<img src="/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree3.png" class="" title="插入之后的B+Tree">
 
 <h3 id="1-3B-Tree的删除"><a href="#1-3B-Tree的删除" class="headerlink" title="1.3B+Tree的删除"></a>1.3B+Tree的删除</h3><p>&emsp;&emsp;相比插入，删除主要考虑的是删除entity之后节点child或者key数量过少，不足以形成一个节点，这时就需要将该节点合并。如果该节点N的前驱或后继节点能容纳N中的entity，那么就将该节点和前驱或者后继合并；如果不能容纳，就将前驱或者后继的child指针拿一个过来增加当前节点child的个数。<br>&emsp;&emsp;以删除key Srinivasa为例，先查找到该entity所在的leaf节点，并删除该entity。删除之后该leaf节点的key个数为1，1&lt;[n-1/2],不足以支撑该节点，所以要寻找前驱或后继看能否容纳该节点的所有剩余entity，其前驱节点N‘恰好能容纳，过程如下：<br>1.将所有剩余的entity移过去，并删除该节点。<br>2.伴随着节点压缩，其父entity同样被压缩，即父entity的前后child指针合并，父entity删除。：</p>
-
+<img src="/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree4.png" class="" title="删除leaf之后的B+Tree">
 <p>&emsp;&emsp;现在父节点只有一个child，不满足构成节点所需的最少child个数，所以需要合并，但其前驱和后继都没有空间容纳该child指针，所以需要找前驱N’借一个child，借的过程如下：<br>1.从前驱中删除最后一个key和child指针；<br>2.将child当作N中的第一个child，key当作第一个key；<br>3.将key和N与N‘的父entity包含的key交换。</p>
-
+<img src="/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree5.png" class="" title="删除leaf之后传播导致父节点合并的B+Tree">
 
 <p>&emsp;&emsp;删除之后B+Tree的形状如下：</p>
-
+<img src="/2020/08/02/B-tree%E6%B5%85%E6%9E%90/tree6.png" class="" title="删除leaf之后最终的B+Tree">
 
 <p>&emsp;&emsp;如果根节点只有一个child指针，则删除根节点并将根节点的child当作新的根节点。</p>
   
@@ -162,7 +169,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/" data-title="B+tree浅析 | Hexo" data-tsina="" class="share clearfix">
+	  <div data-url="http://example.com/2020/08/02/B-tree%E6%B5%85%E6%9E%90/" data-title="B+tree浅析 | 烟光凝而暮山紫" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -218,7 +225,7 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/JAVA/" title="JAVA">JAVA<sup>3</sup></a></li>
+			<li><a href="/categories/JAVA/" title="JAVA">JAVA<sup>4</sup></a></li>
 		  
 		
 		  
@@ -234,6 +241,10 @@
 		  
 		
 		  
+			<li><a href="/categories/JAVA/框架/工作流/" title="工作流">工作流<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
 		  
 		
@@ -242,7 +253,7 @@
 		  
 		
 		  
-			<li><a href="/categories/JAVA/框架/" title="框架">框架<sup>2</sup></a></li>
+			<li><a href="/categories/JAVA/框架/" title="框架">框架<sup>3</sup></a></li>
 		  
 		
 		</ul>
@@ -264,6 +275,18 @@
 		
 			
 				<li><a href="/tags/docker/" title="docker">docker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flowable/" title="flowable">flowable<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/命令模式/" title="命令模式">命令模式<sup>1</sup></a></li>
 			
 		
 			
@@ -337,7 +360,7 @@
 		<p class="copyright">
 		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
 		
-		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		<a href="/about" target="_blank" title="shiyu">shiyu</a>
 		
 		
 		</p>

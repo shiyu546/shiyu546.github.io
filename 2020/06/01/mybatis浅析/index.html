@@ -4,10 +4,10 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>mybatis浅析 | Hexo</title>
+    <title>mybatis浅析 | 烟光凝而暮山紫</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
-    <meta name="author" content="John Doe">
+    <meta name="author" content="shiyu">
     
 
     
@@ -15,17 +15,21 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="mybatis浅析">
 <meta property="og:url" content="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/index.html">
-<meta property="og:site_name" content="Hexo">
+<meta property="og:site_name" content="烟光凝而暮山紫">
 <meta property="og:description" content="1.mybatis调用结构 1.1 mybatis基础核心类 1.2 SqlSessionFactoryBuilder 1.3 SqlSessionFactory 1.4 SqlSession   2.SqlSession 2.1 SqlSession调用 2.2 Executor与mybatis的缓存     1.mybatis调用结构1.1 mybatis基础核心类&amp;emsp;&amp;emsp">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic1.jpg">
+<meta property="og:image" content="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic2.jpg">
+<meta property="og:image" content="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic3.png">
 <meta property="article:published_time" content="2020-06-01T09:01:54.000Z">
-<meta property="article:modified_time" content="2020-08-02T10:56:22.362Z">
-<meta property="article:author" content="John Doe">
+<meta property="article:modified_time" content="2020-09-21T02:37:16.024Z">
+<meta property="article:author" content="shiyu">
 <meta property="article:tag" content="mybatis">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic1.jpg">
 
     
-    <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="烟光凝而暮山紫" type="application/atom+xml">
     
     
     <link rel="icon" href="/img/favicon.ico">
@@ -47,11 +51,11 @@
 <div>
 		
 			<div id="imglogo">
-				<a href="/"><img src="/img/logo.png" alt="Hexo" title="Hexo"/></a>
+				<a href="/"><img src="/img/logo.png" alt="烟光凝而暮山紫" title="烟光凝而暮山紫"/></a>
 			</div>
 			
 			<div id="textlogo">
-				<h1 class="site-name"><a href="/" title="Hexo">Hexo</a></h1>
+				<h1 class="site-name"><a href="/" title="烟光凝而暮山紫">烟光凝而暮山紫</a></h1>
 				<h2 class="blog-motto"></h2>
 			</div>
 			<div class="navbar"><a class="navbutton navmobile" href="#" title="Menu">
@@ -92,7 +96,7 @@
   </h1>
   <p class="article-author">By
        
-		<a href="/about" title="John Doe" target="_blank" itemprop="author">John Doe</a>
+		<a href="/about" title="shiyu" target="_blank" itemprop="author">shiyu</a>
 		
   <p class="article-time">
     <time datetime="2020-06-01T09:01:54.000Z" itemprop="datePublished"> Published 2020-06-01</time>
@@ -127,7 +131,7 @@
 <!-- /TOC -->
 <h2 id="1-mybatis调用结构"><a href="#1-mybatis调用结构" class="headerlink" title="1.mybatis调用结构"></a>1.mybatis调用结构</h2><h3 id="1-1-mybatis基础核心类"><a href="#1-1-mybatis基础核心类" class="headerlink" title="1.1 mybatis基础核心类"></a>1.1 mybatis基础核心类</h3><p>&emsp;&emsp;mybatis是一个ORM框架，由于具有非常灵活的SQL编写方法，所以使用比较广泛，下面分析一下mybatis对JDBC做了哪些封装和增强.  </p>
 <p>&emsp;&emsp;Mybatis的核心是SqlSessionFacotry类，SqlSessionFactory从SqlSessionFactoryBuilder获得。我们可以从SqlSessionFactory中获取SqlSession实例，SqlSession提供了数据库执行SQL命令的所有方法。整个过程如下：  </p>
-
+<img src="/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic1.jpg" class="" title="类调用图">
 
 <h3 id="1-2-SqlSessionFactoryBuilder"><a href="#1-2-SqlSessionFactoryBuilder" class="headerlink" title="1.2 SqlSessionFactoryBuilder"></a>1.2 SqlSessionFactoryBuilder</h3><p>&emsp;&emsp;SqlSessionFactoryBuilder有多种重载方法生成SqlSessionFactory。  </p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, String environment)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, Properties properties)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(InputStream inputStream, String env, Properties props)</span>  </span></span><br><span class="line"><span class="function">SqlSessionFactory <span class="title">build</span><span class="params">(Configuration config)</span>  </span></span><br></pre></td></tr></table></figure>
@@ -155,7 +159,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//数据操作部分，CRUD操作  </span></span><br><span class="line">&lt;T&gt; <span class="function">T <span class="title">selectOne</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;E&gt; List&lt;E&gt; <span class="title">selectList</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;T&gt; Cursor&lt;T&gt; <span class="title">selectCursor</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;K,V&gt; Map&lt;K,V&gt; <span class="title">selectMap</span><span class="params">(String statement, Object parameter, String mapKey)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">insert</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">update</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">delete</span><span class="params">(String statement, Object parameter)</span>  </span></span><br><span class="line"><span class="function">&lt;E&gt; List&lt;E&gt; <span class="title">selectList</span> <span class="params">(String statement, Object parameter, RowBounds rowBounds)</span>  </span></span><br><span class="line"><span class="function">&lt;T&gt; Cursor&lt;T&gt; <span class="title">selectCursor</span><span class="params">(String statement, Object parameter, RowBounds rowBounds)</span>  </span></span><br><span class="line"><span class="function">&lt;K,V&gt; Map&lt;K,V&gt; <span class="title">selectMap</span><span class="params">(String statement, Object parameter, String mapKey, RowBounds rowbounds)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">select</span> <span class="params">(String statement, Object parameter, ResultHandler&lt;T&gt; handler)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">select</span> <span class="params">(String statement, Object parameter, RowBounds rowBounds, ResultHandler&lt;T&gt; handler)</span>  </span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="comment">//事务控制  </span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">commit</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">commit</span><span class="params">(<span class="keyword">boolean</span> force)</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rollback</span><span class="params">()</span>  </span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rollback</span><span class="params">(<span class="keyword">boolean</span> force)</span>  </span></span><br></pre></td></tr></table></figure>
 
 <h2 id="2-SqlSession"><a href="#2-SqlSession" class="headerlink" title="2.SqlSession"></a>2.SqlSession</h2><h3 id="2-1-SqlSession调用"><a href="#2-1-SqlSession调用" class="headerlink" title="2.1 SqlSession调用"></a>2.1 SqlSession调用</h3><p>&emsp;&emsp;以SqlSession的selectList()方法为例,该方法实际上就是将具体的SQL执行委托给具体的Executor类去执行，上面说过共有三种ExecutorType：Simple，reuse,batch。除此之外，mybatis中还有一种CachingExecutor的实现,类的继承图如下：</p>
-
+<img src="/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic2.jpg" class="" title="Executor接口类图">
 
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Executor executor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> &lt;E&gt; <span class="function">List&lt;E&gt; <span class="title">selectList</span><span class="params">(String statement, Object parameter, RowBounds rowBounds)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    MappedStatement ms = configuration.getMappedStatement(statement);</span><br><span class="line">    <span class="keyword">return</span> executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> ExceptionFactory.wrapException(<span class="string">&quot;Error querying database.  Cause: &quot;</span> + e, e);</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    ErrorContext.instance().reset();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -170,7 +174,7 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">&quot;selectAuthorLinkedHashMap&quot;</span> <span class="attr">resultType</span>=<span class="string">&quot;java.util.LinkedHashMap&quot;</span>&gt;</span></span><br><span class="line">       select id, username from author where id = #&#123;value&#125;</span><br><span class="line">   <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>&emsp;&emsp;而MappedStatement是全局配置对象Configuration的属性，所以该Cache是全局的，从而二级缓存是全局的，其key是SQL节点和SQL语句。</p>
-
+<img src="/2020/06/01/mybatis%E6%B5%85%E6%9E%90/pic3.png" class="" title="mybatis两级缓存">
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -193,7 +197,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/" data-title="mybatis浅析 | Hexo" data-tsina="" class="share clearfix">
+	  <div data-url="http://example.com/2020/06/01/mybatis%E6%B5%85%E6%9E%90/" data-title="mybatis浅析 | 烟光凝而暮山紫" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -241,7 +245,7 @@
 		<ul>
 		
 		  
-			<li><a href="/categories/JAVA/" title="JAVA">JAVA<sup>3</sup></a></li>
+			<li><a href="/categories/JAVA/" title="JAVA">JAVA<sup>4</sup></a></li>
 		  
 		
 		  
@@ -257,6 +261,10 @@
 		  
 		
 		  
+			<li><a href="/categories/JAVA/框架/工作流/" title="工作流">工作流<sup>1</sup></a></li>
+		  
+		
+		  
 			<li><a href="/categories/数据库/" title="数据库">数据库<sup>1</sup></a></li>
 		  
 		
@@ -265,7 +273,7 @@
 		  
 		
 		  
-			<li><a href="/categories/JAVA/框架/" title="框架">框架<sup>2</sup></a></li>
+			<li><a href="/categories/JAVA/框架/" title="框架">框架<sup>3</sup></a></li>
 		  
 		
 		</ul>
@@ -287,6 +295,18 @@
 		
 			
 				<li><a href="/tags/docker/" title="docker">docker<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/flowable/" title="flowable">flowable<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/设计模式/" title="设计模式">设计模式<sup>1</sup></a></li>
+			
+		
+			
+				<li><a href="/tags/命令模式/" title="命令模式">命令模式<sup>1</sup></a></li>
 			
 		
 			
@@ -360,7 +380,7 @@
 		<p class="copyright">
 		Powered by <a href="http://hexo.io" target="_blank" title="hexo">hexo</a> and Theme by <a href="https://github.com/wuchong/jacman" target="_blank" title="Jacman">Jacman</a> © 2020 
 		
-		<a href="/about" target="_blank" title="John Doe">John Doe</a>
+		<a href="/about" target="_blank" title="shiyu">shiyu</a>
 		
 		
 		</p>

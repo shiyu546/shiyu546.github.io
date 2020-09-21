@@ -4,26 +4,30 @@
 <head>
   <meta charset="UTF-8">
   
-    <title>Docker下安装mysql | 烟光凝而暮山紫</title>
+    <title>Flowable命令模式解析 | 烟光凝而暮山紫</title>
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no">
     
     <meta name="author" content="shiyu">
     
 
     
-    <meta name="description" content="1.起因&amp;emsp;&amp;emsp;打算在raspberry上安装一个mysql，由于raspberry基于arm架构，普通的linux版mysql用不了，最后看到可以通过docker来安装mysql，固将安装过程的步骤以及碰到的问题记录下来。 2.安装过程2.1安装docker&amp;emsp;&amp;emsp;docker的安装步骤通过mysql官方文档链接的docker安装过程即可，主要命令如下： 1234">
+    <meta name="description" content="1.Flowable工作流1.1 Flowable简介&amp;emsp;&amp;emsp;Flowable是一个基于activiti的工作流引擎，其在activiti的基础上开发而成。Flowable支持bpmn2.0流程定义标准，创建流程实例，查询活动或者历史的流程实例和相关数据。在了解flowable相关概念之前，需要明白流程相关的几个概念。   &amp;emsp;&amp;emsp;以上是一个典型的流程图，流程图由以">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Docker下安装mysql">
-<meta property="og:url" content="http://example.com/2020/06/10/Docker%E4%B8%8B%E5%AE%89%E8%A3%85mysql/index.html">
+<meta property="og:title" content="Flowable命令模式解析">
+<meta property="og:url" content="http://example.com/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/index.html">
 <meta property="og:site_name" content="烟光凝而暮山紫">
-<meta property="og:description" content="1.起因&amp;emsp;&amp;emsp;打算在raspberry上安装一个mysql，由于raspberry基于arm架构，普通的linux版mysql用不了，最后看到可以通过docker来安装mysql，固将安装过程的步骤以及碰到的问题记录下来。 2.安装过程2.1安装docker&amp;emsp;&amp;emsp;docker的安装步骤通过mysql官方文档链接的docker安装过程即可，主要命令如下： 1234">
+<meta property="og:description" content="1.Flowable工作流1.1 Flowable简介&amp;emsp;&amp;emsp;Flowable是一个基于activiti的工作流引擎，其在activiti的基础上开发而成。Flowable支持bpmn2.0流程定义标准，创建流程实例，查询活动或者历史的流程实例和相关数据。在了解flowable相关概念之前，需要明白流程相关的几个概念。   &amp;emsp;&amp;emsp;以上是一个典型的流程图，流程图由以">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2020-06-10T14:04:18.000Z">
-<meta property="article:modified_time" content="2020-06-10T14:26:53.874Z">
+<meta property="og:image" content="http://example.com/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/process.jpg">
+<meta property="og:image" content="http://example.com/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/engine.jpg">
+<meta property="article:published_time" content="2020-09-21T02:34:45.000Z">
+<meta property="article:modified_time" content="2020-09-21T03:27:44.641Z">
 <meta property="article:author" content="shiyu">
-<meta property="article:tag" content="mysql">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="flowable">
+<meta property="article:tag" content="设计模式">
+<meta property="article:tag" content="命令模式">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/process.jpg">
 
     
     <link rel="alternative" href="/atom.xml" title="烟光凝而暮山紫" type="application/atom+xml">
@@ -89,14 +93,14 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2020/06/10/Docker下安装mysql/" title="Docker下安装mysql" itemprop="url">Docker下安装mysql</a>
+      <a href="/2020/09/21/Flowable命令模式解析/" title="Flowable命令模式解析" itemprop="url">Flowable命令模式解析</a>
   </h1>
   <p class="article-author">By
        
 		<a href="/about" title="shiyu" target="_blank" itemprop="author">shiyu</a>
 		
   <p class="article-time">
-    <time datetime="2020-06-10T14:04:18.000Z" itemprop="datePublished"> Published 2020-06-10</time>
+    <time datetime="2020-09-21T02:34:45.000Z" itemprop="datePublished"> Published 2020-09-21</time>
     
   </p>
 </header>
@@ -105,38 +109,30 @@
 		<div id="toc" class="toc-article">
 			<strong class="toc-title">Contents</strong>
 		
-			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%B5%B7%E5%9B%A0"><span class="toc-number">1.</span> <span class="toc-text">1.起因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">2.安装过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E5%AE%89%E8%A3%85docker"><span class="toc-number">2.1.</span> <span class="toc-text">2.1安装docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E4%B8%8B%E8%BD%BDmysql%E9%95%9C%E5%83%8F"><span class="toc-number">2.2.</span> <span class="toc-text">2.2下载mysql镜像</span></a></li></ol></li></ol>
+			<ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Flowable%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-number">1.</span> <span class="toc-text">1.Flowable工作流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Flowable%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 Flowable简介</span></a></li></ol></li></ol>
 		
 		</div>
 		
-		<h2 id="1-起因"><a href="#1-起因" class="headerlink" title="1.起因"></a>1.起因</h2><p>&emsp;&emsp;打算在raspberry上安装一个mysql，由于raspberry基于arm架构，普通的linux版mysql用不了，最后看到可以通过docker来安装mysql，固将安装过程的步骤以及碰到的问题记录下来。</p>
-<h2 id="2-安装过程"><a href="#2-安装过程" class="headerlink" title="2.安装过程"></a>2.安装过程</h2><h3 id="2-1安装docker"><a href="#2-1安装docker" class="headerlink" title="2.1安装docker"></a>2.1安装docker</h3><p>&emsp;&emsp;docker的安装步骤通过mysql官方文档链接的docker安装过程即可，主要命令如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common</span><br><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</span><br><span class="line">apt-key fingerprint 0EBFCD88</span><br><span class="line">add-apt-repository &quot;deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot;</span><br><span class="line">apt-get update</span><br><span class="line">apt-get install docker-ce docker-ce-cli containerd.io</span><br><span class="line">apt-cache madison docker-ce</span><br><span class="line">apt-get install docker-ce=5:19.03.11~3-0~ubuntu-focal docker-ce-cli=5:19.03.11~3-0~ubuntu-focal containerd.io</span><br><span class="line">docker run hello-world</span><br></pre></td></tr></table></figure>
+		<h2 id="1-Flowable工作流"><a href="#1-Flowable工作流" class="headerlink" title="1.Flowable工作流"></a>1.Flowable工作流</h2><h3 id="1-1-Flowable简介"><a href="#1-1-Flowable简介" class="headerlink" title="1.1 Flowable简介"></a>1.1 Flowable简介</h3><p>&emsp;&emsp;Flowable是一个基于activiti的工作流引擎，其在activiti的基础上开发而成。Flowable支持bpmn2.0流程定义标准，创建流程实例，查询活动或者历史的流程实例和相关数据。在了解flowable相关概念之前，需要明白流程相关的几个概念。</p>
+<img src="/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/process.jpg" class="" title="bpmn流程图">
 
-<p>&emsp;&emsp;安装过程按部就班就好，不过由于国内的网速，部分命令会比较慢，然后最后一个测试docker是否安装成功的docker run hello-world会因为服务器的原因报错。</p>
-<h3 id="2-2下载mysql镜像"><a href="#2-2下载mysql镜像" class="headerlink" title="2.2下载mysql镜像"></a>2.2下载mysql镜像</h3><p>&emsp;&emsp;由于国外服务器太慢，需要添加docker国内镜像来下载，命令如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1.</span><br><span class="line">curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://d1d9aef0.m.daocloud.io</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;以上是一个典型的流程图，流程图由以下几个元素组成：</p>
+<ul>
+<li>Flow Objects</li>
+<li>Data</li>
+<li>Connecting Objects</li>
+<li>Swimlanes</li>
+<li>Artifacts</li>
+</ul>
+<p>&emsp;&emsp;Flow Objects是流程图中的主要元素，包括Events(事件),Activities(活动),Gateways(网关);</p>
+<p>&emsp;&emsp;Data有四种元素，包括Data Objects,Data Inputs,Data Outputs,Data Stores;</p>
+<p>&emsp;&emsp;Connecting Objects有四种，包括Sequence Flows,Message FLows,Associations,Data Associations;</p>
+<p>&emsp;&emsp;Swimlanes包括Pools和Lanes两种;</p>
+<p>&emsp;&emsp;Artifacts用来为流程提供额外的信息，包括Group和Text Annoation两种。</p>
+<p>&emsp;&emsp;每一个流程图本质上是一个xml文件，xml元素以及元素的树状层级关系表达了流程的节点以及节点之间的流动关系，Flowable抽象出了BpmnModel对象来表示流程图示。基于xml流程文件，Flowable生成了流程引擎对象ProcessEngine,ProcessEngine持有8个Service，每一个Service用来完成不同的任务。类对象之间的关系如下：</p>
+<img src="/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/engine.jpg" class="" title="flowable流程引擎类关系图">
 
-<p>&emsp;&emsp;然后重启docker：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">2.</span><br><span class="line">systemctl restart docker.service</span><br></pre></td></tr></table></figure>
 
-<p>&emsp;&emsp;然后拉mysql镜像：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">3.</span><br><span class="line">docker pull mysql/mysql-server:latest</span><br></pre></td></tr></table></figure>
-
-<p>&emsp;&emsp;最后启动mysql，命令如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">4.</span><br><span class="line">docker run --name=mysql1 -d mysql/mysql-server:latest</span><br></pre></td></tr></table></figure>
-
-<p>&emsp;&emsp;并可以通过如下命令在docker中连接mysql:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">5.</span><br><span class="line">docker exec -it mysql1 mysql -uroot -p</span><br></pre></td></tr></table></figure>
-
-<p>&emsp;&emsp;以上步骤都很顺利，但当需要通过远程客户端连接mysql时，问题就出现了，尝试多种方法后都无法连接到该mysql。后来通过搜索发现原因时docker没有把mysql的端口暴露出来，于是更改mysql的启动命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">6.</span><br><span class="line">docker run -p 33060:3306 --name mysql2 -e MYSQL_ROOT_PASSWORD=123456 -d mysql/mysql-server</span><br></pre></td></tr></table></figure>
-
-<p>&emsp;&emsp;相比于4处，这里多了一个-p 33060:3306,前者为docker暴露在操作系统中的端口，后者为mysql在docker中的端口。通过这一步骤，终于可以连上mysql了。剩下的就是mysql8.0验证方式改一下。</p>
-<p>&emsp;&emsp;但仍然还遗留了一个问题：mysql本机可以通过ip连接，但无法通过localhsot连接mysql，报错如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR 2002 (HY000): Can&#39;t connect to local MySQL server through socket &#39;&#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.sock&#39;</span><br></pre></td></tr></table></figure>
-
-<p>&emsp;&emsp;这个问题暂时没找到解决方法。</p>
   
 	</div>
 		<footer class="article-footer clearfix">
@@ -144,13 +140,13 @@
 
 <div class="article-categories">
   <span></span>
-  <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a>
+  <a class="article-category-link" href="/categories/JAVA/">JAVA</a>►<a class="article-category-link" href="/categories/JAVA/%E6%A1%86%E6%9E%B6/">框架</a>►<a class="article-category-link" href="/categories/JAVA/%E6%A1%86%E6%9E%B6/%E5%B7%A5%E4%BD%9C%E6%B5%81/">工作流</a>
 </div>
 
 
   <div class="article-tags">
   
-  <span></span> <a href="/tags/mysql/">mysql</a><a href="/tags/docker/">docker</a>
+  <span></span> <a href="/tags/flowable/">flowable</a><a href="/tags/设计模式/">设计模式</a><a href="/tags/命令模式/">命令模式</a>
   </div>
 
 </div>
@@ -159,7 +155,7 @@
 
 	<div class="article-share" id="share">
 	
-	  <div data-url="http://example.com/2020/06/10/Docker%E4%B8%8B%E5%AE%89%E8%A3%85mysql/" data-title="Docker下安装mysql | 烟光凝而暮山紫" data-tsina="" class="share clearfix">
+	  <div data-url="http://example.com/2020/09/21/Flowable%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E8%A7%A3%E6%9E%90/" data-title="Flowable命令模式解析 | 烟光凝而暮山紫" data-tsina="" class="share clearfix">
 	  </div>
 	
 	</div>
@@ -172,19 +168,11 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev" >
- <a href="/2020/06/21/JDK动态代理/" title="JDK动态代理">
-  <strong>上一篇：</strong><br/>
-  <span>
-  JDK动态代理</span>
-</a>
-</div>
-
 
 <div class="next">
-<a href="/2020/06/07/SpringMVC-work-flow/"  title="SpringMVC work flow">
+<a href="/2020/09/21/hello-world/"  title="Hello World">
  <strong>下一篇：</strong><br/> 
- <span>SpringMVC work flow
+ <span>Hello World
 </span>
 </a>
 </div>
@@ -201,7 +189,7 @@
   <div id="toc" class="toc-aside">
   <strong class="toc-title">Contents</strong>
  
- <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%B5%B7%E5%9B%A0"><span class="toc-number">1.</span> <span class="toc-text">1.起因</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AE%89%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">2.安装过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1%E5%AE%89%E8%A3%85docker"><span class="toc-number">2.1.</span> <span class="toc-text">2.1安装docker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2%E4%B8%8B%E8%BD%BDmysql%E9%95%9C%E5%83%8F"><span class="toc-number">2.2.</span> <span class="toc-text">2.2下载mysql镜像</span></a></li></ol></li></ol>
+ <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Flowable%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="toc-number">1.</span> <span class="toc-text">1.Flowable工作流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Flowable%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 Flowable简介</span></a></li></ol></li></ol>
  
   </div>
 
